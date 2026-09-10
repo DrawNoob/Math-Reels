@@ -228,8 +228,8 @@
     .gallery-video { width: 100%; height: 100%; object-fit: cover; background: #111; display: block }
 
     .gallery-card-caption {
-      margin-top: 8px; font-size: 11px; color: var(--muted); line-height: 1.3;
-      display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+      margin-top: 8px; font-size: 12px; font-weight: 700; color: var(--ink); text-align: center;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
 
     .gallery-empty {
@@ -324,8 +324,8 @@
 
           <div class="row title-fps" style="margin-top:12px">
             <div>
-              <label for="title">Заголовок першого кадру</label>
-              <input id="title" type="text" value="Математика у нашому житті">
+              <label for="authorName">Автор (необов’язково)</label>
+              <input id="authorName" type="text" placeholder="Ім’я автора" maxlength="40">
             </div>
             <div>
               <label for="fps">FPS</label>
@@ -444,7 +444,7 @@
     const ctx = canvas.getContext("2d");
     const durationInput = document.getElementById("duration");
     const fpsSelect = document.getElementById("fps");
-    const titleInput = document.getElementById("title");
+    const authorInput = document.getElementById("authorName");
     const styleSelect = document.getElementById("textStyle");
     const renderBtn = document.getElementById("renderBtn");
     const autoPhrasesBtn = document.getElementById("autoPhrases");
@@ -770,7 +770,7 @@
           file: files[i],
           img: loaded.img,
           url: loaded.url,
-          text: i === 0 ? titleInput.value : assigned[i % assigned.length]
+          text: assigned[i % assigned.length]
         });
       }
 
@@ -825,19 +825,11 @@
     autoPhrasesBtn.onclick = () => {
       const assigned = shuffle(phrases);
       slides.forEach((s, i) => {
-        s.text = i === 0 ? titleInput.value : assigned[i % assigned.length];
+        s.text = assigned[i % assigned.length];
       });
       buildSlideEditor();
       if(slides[0]) drawFrame(slides[0], 0, 0);
     };
-
-    titleInput.addEventListener("input", () => {
-      if(slides[0]){
-        slides[0].text = titleInput.value;
-        buildSlideEditor();
-        drawFrame(slides[0], 0, 0);
-      }
-    });
 
     function drawCover(img, progress){
       const cw = canvas.width, ch = canvas.height;
@@ -1003,7 +995,7 @@
       const done = new Promise(resolve => {
         recorder.onstop = async () => {
           const webmBlob = new Blob(chunks, { type: mimeType });
-          uploadReelToGallery(webmBlob, slides[0] ? slides[0].text : "");
+          uploadReelToGallery(webmBlob, authorInput.value.trim() || "Анонім");
 
           if(audioSource){
             try{ audioSource.stop(); }catch(e){}
