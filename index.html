@@ -1,0 +1,829 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Reels: Математика у нашому житті — інструкція + генератор</title>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --ink: #172033;
+      --muted: #697386;
+      --line: #dfe5ee;
+      --blue: #3457d5;
+      --blue2: #5f79e8;
+      --green: #198754;
+      --shadow: 0 18px 55px rgba(25, 40, 80, .09);
+    }
+
+    * { box-sizing: border-box }
+    html { scroll-behavior: smooth }
+
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #eef3ff 0, #f7f9fc 420px, #f5f7fb 100%);
+      color: var(--ink);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      line-height: 1.55;
+    }
+
+    /* ---------- hero ---------- */
+    .hero {
+      padding: 58px 20px 46px;
+      background:
+        radial-gradient(circle at 15% 20%, rgba(255, 255, 255, .26), transparent 26%),
+        radial-gradient(circle at 85% 30%, rgba(255, 255, 255, .16), transparent 24%),
+        linear-gradient(135deg, #243b9f, #4e70e9);
+      color: #fff;
+    }
+
+    .wrap { max-width: 1180px; margin: 0 auto }
+
+    .hero h1 { font-size: clamp(34px, 5vw, 58px); line-height: 1.02; margin: 0 0 15px }
+    .hero p { font-size: 18px; max-width: 800px; margin: 0; color: #e9eeff }
+
+    .pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 7px 12px; border-radius: 999px;
+      background: rgba(255, 255, 255, .14);
+      border: 1px solid rgba(255, 255, 255, .25);
+      font-weight: 700; font-size: 13px; margin-bottom: 16px;
+    }
+
+    /* ---------- layout ---------- */
+    main { padding: 30px 20px 80px }
+
+    .reels-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; align-items: start }
+
+    .card {
+      background: var(--card); border: 1px solid var(--line); border-radius: 20px;
+      padding: 24px; box-shadow: var(--shadow); margin-bottom: 22px;
+    }
+
+    .intro-card { width: 100%; margin-bottom: 22px }
+    .intro-card h2 { margin-bottom: 12px }
+
+    .mini-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px }
+    .mini-steps > div { padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: #f8faff }
+
+    .reels-grid .card { margin-bottom: 0; min-width: 0 }
+    .generator-card, .texts-card, .video-card { height: 100% }
+
+    h2 { margin: 0 0 14px; font-size: 28px; line-height: 1.15 }
+    h3 { margin: 22px 0 10px; font-size: 19px }
+    .small { font-size: 13px; color: var(--muted) }
+
+    /* ---------- steps / tips ---------- */
+    .steps { display: grid; gap: 12px }
+    .step { display: flex; gap: 12px; align-items: flex-start }
+
+    .n {
+      flex: 0 0 34px; height: 34px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: #eef2ff; color: var(--blue); font-weight: 800;
+    }
+
+    .tip { padding: 14px 15px; border-radius: 13px; background: #f3f7ff; border: 1px solid #dfe8ff }
+    .success { padding: 16px 16px; border-radius: 13px; background: #effaf4; border: 1px solid #d5f0df }
+
+    /* ---------- form controls ---------- */
+    label { display: block; font-weight: 700; font-size: 14px; margin-bottom: 7px }
+
+    input[type="text"], input[type="number"], select, textarea {
+      width: 100%; border: 1px solid #d8deea; border-radius: 11px; padding: 11px 12px;
+      font: inherit; color: var(--ink); background: #fff; outline: none;
+    }
+
+    input:focus, textarea:focus, select:focus { border-color: #8aa0ff; box-shadow: 0 0 0 3px rgba(52, 87, 213, .10) }
+    textarea { min-height: 86px; resize: vertical }
+
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px }
+    .row.title-fps { grid-template-columns: minmax(0, 3fr) minmax(0, 1fr) }
+
+    .controls { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px }
+    .download-controls { margin-top: 18px; margin-bottom: 18px }
+
+    button, .btn {
+      appearance: none; border: 0; border-radius: 11px; padding: 11px 15px;
+      font-weight: 800; cursor: pointer; font: inherit;
+    }
+
+    .primary { background: var(--blue); color: #fff }
+    .primary:hover { background: #2949c5 }
+    .secondary { background: #edf1f7; color: #24304a }
+    .secondary:hover { background: #e3e8f0 }
+    .green { background: var(--green); color: #fff }
+    button:disabled { opacity: .5; cursor: not-allowed }
+
+    .upload {
+      border: 2px dashed #cfd8ea; border-radius: 16px; padding: 20px; text-align: center;
+      background: #fafcff; cursor: pointer;
+    }
+
+    .upload:hover { border-color: #9fb2ef; background: #f6f8ff }
+    .music-upload { padding: 14px }
+    input[type=file] { display: none }
+
+    /* ---------- phone preview ---------- */
+    .phone-shell {
+      width: min(320px, 100%); margin: 0 auto; padding: 10px; border-radius: 32px;
+      background: #111827; box-shadow: 0 22px 60px rgba(17, 24, 39, .22);
+    }
+
+    .preview-wrap {
+      position: relative; aspect-ratio: 9 / 16; border-radius: 24px; overflow: hidden; background: #0f172a;
+    }
+
+    canvas { display: block; width: 100%; height: 100%; background: #111 }
+
+    .badge {
+      display: inline-block; padding: 4px 8px; border-radius: 999px; background: #edf2ff; color: #3551bb;
+      font-size: 12px; font-weight: 800;
+    }
+
+    /* ---------- slide editor ---------- */
+    .slides { display: grid; gap: 10px; margin-top: 14px }
+
+    .slide-row {
+      display: grid; grid-template-columns: 70px minmax(0, 1fr) 42px; gap: 10px; align-items: center;
+      border: 1px solid var(--line); border-radius: 13px; padding: 9px; background: #fbfcff;
+    }
+
+    .thumb { width: 70px; height: 100px; border-radius: 9px; object-fit: cover; background: #e9edf4 }
+    .slide-row textarea { min-height: 88px; width: 100%; resize: vertical; line-height: 1.45 }
+
+    .icon-btn {
+      width: 42px; height: 42px; padding: 0; border-radius: 10px; background: #f0f3f8;
+      display: flex; align-items: center; justify-content: center; font-size: 18px;
+    }
+
+    .progress { height: 8px; background: #e8edf5; border-radius: 999px; overflow: hidden; margin-top: 12px }
+    .progress > div { height: 100%; width: 0; background: linear-gradient(90deg, var(--blue), #6a83ef) }
+
+    .footer-note { font-size: 12px; color: var(--muted); margin-top: 10px }
+    code { background: #eef2f7; padding: 2px 5px; border-radius: 5px }
+
+    @media (max-width: 1050px) {
+      .reels-grid { grid-template-columns: 1fr }
+      .mini-steps { grid-template-columns: 1fr }
+      .phone-shell { width: min(420px, 100%) }
+    }
+
+    @media (max-width: 560px) {
+      .row.title-fps { grid-template-columns: 1fr }
+      main { padding-left: 12px; padding-right: 12px }
+      .card { padding: 16px; border-radius: 16px }
+      .row { grid-template-columns: 1fr }
+      .slide-row { grid-template-columns: 60px minmax(0, 1fr) 40px }
+      .slide-row .icon-btn { grid-column: auto }
+      .thumb { width: 60px; height: 86px }
+    }
+  </style>
+</head>
+<body>
+  <section class="hero">
+    <div class="wrap">
+      <div class="pill">📐 Освітній Reels • 9:16 • Instagram / TikTok</div>
+      <h1>Математика у нашому житті</h1>
+      <p>Готова інструкція + мінігенератор: додаєш фото, сервіс сам розкладає їх по слайдах, накладає тематичні фрази, показує вертикальний прев’ю і рендерить відео для Reels.</p>
+    </div>
+  </section>
+
+  <main>
+    <div class="wrap">
+
+      <section class="card intro-card">
+        <h2>Як зробити Reels</h2>
+        <div class="mini-steps">
+          <div><b>1.</b> Додай 3–5 фото</div>
+          <div><b>2.</b> Залиши коротку фразу на кожному кадрі</div>
+          <div><b>3.</b> Створи вертикальне відео 9:16 і завантаж його</div>
+        </div>
+      </section>
+
+      <div class="reels-grid">
+
+        <section class="card generator-card">
+          <div style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap">
+            <div>
+              <span class="badge">ГЕНЕРАТОР</span>
+              <h2 style="margin-top:8px">Фото у Reels</h2>
+            </div>
+            <div class="small">1080 × 1920 • 9:16</div>
+          </div>
+
+          <label class="upload" for="photos">
+            <div style="font-size:34px">🖼️</div>
+            <b>Додати фотографії</b><br>
+            <span class="small">Обери декілька JPG / PNG / WEBP</span>
+          </label>
+          <input id="photos" type="file" accept="image/*" multiple>
+
+          <div class="row" style="margin-top:14px">
+            <div>
+              <label for="duration">Тривалість кадру, сек.</label>
+              <input id="duration" type="number" min="1" max="6" step=".5" value="2.5">
+            </div>
+            <div>
+              <label for="textStyle">Стиль тексту</label>
+              <select id="textStyle">
+                <option value="bottom">Знизу</option>
+                <option value="center">По центру</option>
+                <option value="top">Зверху</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row title-fps" style="margin-top:12px">
+            <div>
+              <label for="title">Заголовок першого кадру</label>
+              <input id="title" type="text" value="Математика у нашому житті">
+            </div>
+            <div>
+              <label for="fps">FPS</label>
+              <select id="fps">
+                <option>30</option>
+                <option>24</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-top:14px">
+            <label class="upload music-upload" for="music">
+              <div style="font-size:30px">🎵</div>
+              <b>Додати музику</b><br>
+              <span class="small">MP3 / WAV / M4A — необов’язково</span>
+            </label>
+            <input id="music" type="file" accept="audio/*">
+            <div id="musicName" class="footer-note">Музика не вибрана.</div>
+          </div>
+
+          <div class="controls">
+            <button id="autoPhrases" class="secondary" disabled>✨ Нові фрази</button>
+            <button id="renderBtn" class="primary" disabled>🎬 Створити відео</button>
+          </div>
+
+          <div class="progress"><div id="bar"></div></div>
+          <div id="status" class="footer-note">Додай фото, щоб почати.</div>
+        </section>
+
+        <section class="card texts-card">
+          <span class="badge">ТЕКСТИ ДО ФОТО</span>
+          <h2 style="margin-top:8px">Фрази для кадрів</h2>
+          <p class="small">Після завантаження фото тут з’являться всі кадри. Текст кожного можна змінити вручну.</p>
+          <div id="slides" class="slides"></div>
+        </section>
+
+        <section class="card video-card">
+          <span class="badge">ВІДЕО</span>
+          <h2 style="margin-top:8px">Готовий Reels</h2>
+
+          <div class="phone-shell">
+            <div class="preview-wrap">
+              <canvas id="canvas" width="1080" height="1920"></canvas>
+            </div>
+          </div>
+
+          <div class="controls download-controls" style="justify-content:center">
+            <a id="downloadLink" class="btn green" style="display:none;text-decoration:none" download="matematyka-u-nashomu-zhytti.mp4">⬇ Завантажити MP4</a>
+          </div>
+
+          <div class="success small">
+            Відео створюється прямо у браузері та автоматично конвертується в MP4 (H.264 + AAC), щоб його можна було нормально відкрити на телефоні та завантажити в Reels. Конвертер вбудований у сайт — інтернет для нього не потрібен.
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const phrases = [
+      "Математика навколо нас щодня.",
+      "Знижки в магазині — це відсотки.",
+      "Час і дорога — це швидкість та відстань.",
+      "Кулінарія — це пропорції.",
+      "Покупки — це бюджет і підрахунки.",
+      "Спорт — це час, темп і статистика.",
+      "Ремонт — це площа, довжина й вимірювання.",
+      "Навіть телефон рахує більше, ніж ми помічаємо.",
+      "Математика допомагає приймати рішення.",
+      "Математика — не лише урок. Це життя."
+    ];
+
+    const photosInput = document.getElementById("photos");
+    const slidesEl = document.getElementById("slides");
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const durationInput = document.getElementById("duration");
+    const fpsSelect = document.getElementById("fps");
+    const titleInput = document.getElementById("title");
+    const styleSelect = document.getElementById("textStyle");
+    const renderBtn = document.getElementById("renderBtn");
+    const autoPhrasesBtn = document.getElementById("autoPhrases");
+    const statusEl = document.getElementById("status");
+    const bar = document.getElementById("bar");
+    const downloadLink = document.getElementById("downloadLink");
+    const musicInput = document.getElementById("music");
+    const musicName = document.getElementById("musicName");
+
+    let slides = [];
+    let objectUrl = null;
+    let musicBuffer = null;
+    let musicFileName = "";
+
+    let ffmpegInstance = null;
+    let ffmpegReady = false;
+
+    /*
+      FFmpeg (@ffmpeg/ffmpeg + @ffmpeg/core), включно з ESM-воркером,
+      завантажений локально у ./vendor/ffmpeg/ — файл поруч з index.html,
+      тому це просто same-origin ES-модуль. Це важливо: конструктор
+      Worker() з "type: module" не дозволяє importScripts всередині
+      воркера, а сам воркер тягне свої відносні імпорти (./const.js,
+      ./errors.js) — обидва варіанти надійно працюють лише коли все
+      лежить на одному origin, а не завантажується як окремий blob
+      з CDN. Тому тут НЕ використовуємо CDN-версію напряму.
+    */
+    /*
+      Абсолютні шляхи від кореня сайту (не відносні!) — бо ці рядки
+      підставляються у new URL(x, import.meta.url) всередині classes.js
+      і worker.js, а вони лежать у vendor/ffmpeg/ffmpeg/, тобто
+      "відносно" там означало б відносно ТІЄЇ папки, а не index.html.
+    */
+    const FFMPEG_BASE = "/vendor/ffmpeg/ffmpeg";
+    const FFMPEG_CORE_BASE = "/vendor/ffmpeg/core";
+
+    async function getFFmpeg(){
+      if(ffmpegReady && ffmpegInstance) return ffmpegInstance;
+
+      statusEl.textContent = "Готую MP4-конвертер...";
+      bar.style.width = "8%";
+
+      const { FFmpeg } = await import(`${FFMPEG_BASE}/index.js`);
+
+      const ffmpeg = new FFmpeg();
+
+      ffmpeg.on("log", ({ message }) => {
+        console.log("[ffmpeg]", message);
+      });
+
+      ffmpeg.on("progress", ({ progress }) => {
+        const p = Math.max(0, Math.min(1, progress || 0));
+        bar.style.width = (70 + p * 28) + "%";
+        statusEl.textContent = "Конвертую у MP4... " + Math.round(p * 100) + "%";
+      });
+
+      await ffmpeg.load({
+        classWorkerURL: `${FFMPEG_BASE}/worker.js`,
+        coreURL: `${FFMPEG_CORE_BASE}/ffmpeg-core.js`,
+        wasmURL: `${FFMPEG_CORE_BASE}/ffmpeg-core.wasm`
+      });
+
+      ffmpegInstance = ffmpeg;
+      ffmpegReady = true;
+
+      return ffmpeg;
+    }
+
+    async function convertWebMToMP4(webmBlob, fps){
+      const ffmpeg = await getFFmpeg();
+      const { fetchFile } = await import("/vendor/ffmpeg/util/index.js");
+
+      statusEl.textContent = "Готую MP4...";
+      bar.style.width = "70%";
+
+      try{ await ffmpeg.deleteFile("input.webm"); }catch(e){}
+      try{ await ffmpeg.deleteFile("output.mp4"); }catch(e){}
+
+      await ffmpeg.writeFile(
+        "input.webm",
+        await fetchFile(webmBlob)
+      );
+
+      /*
+        WebM, записаний через MediaRecorder, не має валідної тривалості/
+        частоти кадрів у заголовку (ffmpeg бачить "Duration: N/A" і
+        визначає ~1000 tbr). Без явного "-r fps" перед "-i" ffmpeg
+        намагається розтягнути відео під хибно визначену частоту кадрів
+        і "застрягає", генеруючи тисячі дублікатів кадрів. "-r" перед
+        входом примусово задає реальну частоту кадрів запису.
+      */
+      let exitCode = await ffmpeg.exec([
+        "-r", String(fps),
+        "-i", "input.webm",
+        "-movflags", "+faststart",
+        "output.mp4"
+      ]);
+
+      /*
+        Якщо конкретна збірка/браузер не підібрав кодеки автоматично,
+        робимо другий прохід з явними параметрами для телефону.
+      */
+      if(exitCode !== 0){
+        console.warn("Default MP4 conversion failed, retrying with explicit codecs.");
+
+        try{ await ffmpeg.deleteFile("output.mp4"); }catch(e){}
+
+        exitCode = await ffmpeg.exec([
+          "-r", String(fps),
+          "-i", "input.webm",
+          "-c:v", "libx264",
+          "-pix_fmt", "yuv420p",
+          "-preset", "ultrafast",
+          "-crf", "24",
+          "-c:a", "aac",
+          "-b:a", "160k",
+          "-movflags", "+faststart",
+          "output.mp4"
+        ]);
+      }
+
+      if(exitCode !== 0){
+        throw new Error("FFmpeg завершив MP4-конвертацію з кодом " + exitCode);
+      }
+
+      const data = await ffmpeg.readFile("output.mp4");
+
+      if(!data || !data.byteLength){
+        throw new Error("FFmpeg створив порожній MP4.");
+      }
+
+      try{
+        await ffmpeg.deleteFile("input.webm");
+        await ffmpeg.deleteFile("output.mp4");
+      }catch(e){}
+
+      return new Blob(
+        [data.buffer],
+        { type: "video/mp4" }
+      );
+    }
+
+    function shuffle(arr){
+      const a = [...arr];
+      for(let i = a.length - 1; i > 0; i--){
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function loadImage(file){
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+        img.onload = () => resolve({ img, url });
+        img.onerror = reject;
+        img.src = url;
+      });
+    }
+
+    musicInput.addEventListener("change", async () => {
+      const file = musicInput.files && musicInput.files[0];
+      musicBuffer = null;
+      musicFileName = "";
+
+      if(!file){
+        musicName.textContent = "Музика не вибрана.";
+        return;
+      }
+
+      try{
+        musicName.textContent = "Завантажую музику...";
+        const arrayBuffer = await file.arrayBuffer();
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        musicBuffer = await audioCtx.decodeAudioData(arrayBuffer.slice(0));
+        await audioCtx.close();
+        musicFileName = file.name;
+        musicName.textContent = "🎵 " + file.name;
+      }catch(err){
+        console.error(err);
+        musicBuffer = null;
+        musicFileName = "";
+        musicName.textContent = "Не вдалося прочитати аудіофайл.";
+      }
+    });
+
+    photosInput.addEventListener("change", async () => {
+      slides.forEach(s => s.url && URL.revokeObjectURL(s.url));
+      slides = [];
+      downloadLink.style.display = "none";
+      const files = [...photosInput.files];
+      if(!files.length) return;
+
+      statusEl.textContent = "Завантажую фото...";
+      const assigned = shuffle(phrases);
+
+      for(let i = 0; i < files.length; i++){
+        const loaded = await loadImage(files[i]);
+        slides.push({
+          file: files[i],
+          img: loaded.img,
+          url: loaded.url,
+          text: i === 0 ? titleInput.value : assigned[i % assigned.length]
+        });
+      }
+
+      buildSlideEditor();
+      drawFrame(slides[0], 0, 0);
+      renderBtn.disabled = false;
+      autoPhrasesBtn.disabled = false;
+      statusEl.textContent = `Готово: ${slides.length} фото. Можеш змінити фрази або створити відео.`;
+    });
+
+    function buildSlideEditor(){
+      slidesEl.innerHTML = "";
+      slides.forEach((slide, index) => {
+        const row = document.createElement("div");
+        row.className = "slide-row";
+
+        const img = document.createElement("img");
+        img.src = slide.url;
+        img.className = "thumb";
+
+        const ta = document.createElement("textarea");
+        ta.value = slide.text;
+        ta.addEventListener("input", () => {
+          slide.text = ta.value;
+          drawFrame(slide, 0, index);
+        });
+
+        const del = document.createElement("button");
+        del.className = "icon-btn";
+        del.type = "button";
+        del.setAttribute("aria-label", "Видалити фото");
+        del.title = "Видалити";
+        del.innerHTML = "🗑️";
+        del.onclick = () => {
+          URL.revokeObjectURL(slide.url);
+          slides.splice(index, 1);
+          buildSlideEditor();
+          if(slides.length){
+            drawFrame(slides[0], 0, 0);
+          }else{
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            renderBtn.disabled = true;
+            autoPhrasesBtn.disabled = true;
+          }
+        };
+
+        row.append(img, ta, del);
+        slidesEl.appendChild(row);
+      });
+    }
+
+    autoPhrasesBtn.onclick = () => {
+      const assigned = shuffle(phrases);
+      slides.forEach((s, i) => {
+        s.text = i === 0 ? titleInput.value : assigned[i % assigned.length];
+      });
+      buildSlideEditor();
+      if(slides[0]) drawFrame(slides[0], 0, 0);
+    };
+
+    titleInput.addEventListener("input", () => {
+      if(slides[0]){
+        slides[0].text = titleInput.value;
+        buildSlideEditor();
+        drawFrame(slides[0], 0, 0);
+      }
+    });
+
+    function drawCover(img, progress){
+      const cw = canvas.width, ch = canvas.height;
+      const scale = Math.max(cw / img.width, ch / img.height);
+      const zoom = 1 + progress * 0.045;
+      const w = img.width * scale * zoom;
+      const h = img.height * scale * zoom;
+      const x = (cw - w) / 2;
+      const y = (ch - h) / 2;
+      ctx.drawImage(img, x, y, w, h);
+    }
+
+    function roundRectPath(x, y, w, h, r){
+      ctx.beginPath();
+      ctx.moveTo(x + r, y);
+      ctx.arcTo(x + w, y, x + w, y + h, r);
+      ctx.arcTo(x + w, y + h, x, y + h, r);
+      ctx.arcTo(x, y + h, x, y, r);
+      ctx.arcTo(x, y, x + w, y, r);
+      ctx.closePath();
+    }
+
+    function wrapText(text, maxWidth, font){
+      ctx.font = font;
+      const words = text.split(/\s+/);
+      const lines = [];
+      let line = "";
+      for(const word of words){
+        const test = line ? line + " " + word : word;
+        if(ctx.measureText(test).width > maxWidth && line){
+          lines.push(line);
+          line = word;
+        }else{
+          line = test;
+        }
+      }
+      if(line) lines.push(line);
+      return lines;
+    }
+
+    function drawOverlayText(text, style, index){
+      const pad = 84;
+      const boxW = canvas.width - pad * 2;
+      const fontSize = index === 0 ? 74 : 60;
+      const font = `800 ${fontSize}px Arial`;
+      const lines = wrapText(text, boxW - 140, font);
+      const lineH = fontSize * 1.18;
+      const boxH = Math.max(220, lines.length * lineH + 130);
+
+      let y;
+      if(style === "top") y = 170;
+      else if(style === "center") y = (canvas.height - boxH) / 2;
+      else y = canvas.height - boxH - 220;
+
+      ctx.save();
+      ctx.fillStyle = "rgba(9,17,33,.66)";
+      roundRectPath(pad, y, boxW, boxH, 34);
+      ctx.fill();
+
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.font = font;
+      ctx.fillStyle = "#fff";
+
+      const startY = y + boxH / 2 - (lines.length - 1) * lineH / 2 - 12;
+      lines.forEach((line, i) => {
+        ctx.fillText(line, canvas.width / 2, startY + i * lineH);
+      });
+
+      ctx.font = "700 30px Arial";
+      ctx.fillStyle = "rgba(255,255,255,.82)";
+      ctx.fillText("МАТЕМАТИКА У НАШОМУ ЖИТТІ", canvas.width / 2, y + boxH - 46);
+      ctx.restore();
+    }
+
+    function drawFrame(slide, progress, index){
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#0f172a";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      drawCover(slide.img, progress);
+
+      const fade = Math.min(1, progress / 0.12, (1 - progress) / 0.12);
+      ctx.save();
+      ctx.globalAlpha = Math.max(.15, Math.min(1, fade));
+      drawOverlayText(slide.text, styleSelect.value, index);
+      ctx.restore();
+
+      // subtle top gradient for safe area
+      const g = ctx.createLinearGradient(0, 0, 0, 260);
+      g.addColorStop(0, "rgba(0,0,0,.32)");
+      g.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, canvas.width, 260);
+    }
+
+    renderBtn.onclick = async () => {
+      if(!slides.length) return;
+
+      renderBtn.disabled = true;
+      autoPhrasesBtn.disabled = true;
+      downloadLink.style.display = "none";
+      statusEl.textContent = "Рендер відео...";
+      bar.style.width = "0%";
+
+      const fps = parseInt(fpsSelect.value, 10) || 30;
+      const dur = parseFloat(durationInput.value) || 2.5;
+      const total = slides.length * dur;
+
+      const videoStream = canvas.captureStream(fps);
+      let finalStream = videoStream;
+
+      let audioCtx = null;
+      let audioSource = null;
+
+      if(musicBuffer){
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const destination = audioCtx.createMediaStreamDestination();
+
+        audioSource = audioCtx.createBufferSource();
+        audioSource.buffer = musicBuffer;
+        audioSource.connect(destination);
+
+        const finalTracks = [
+          ...videoStream.getVideoTracks(),
+          ...destination.stream.getAudioTracks()
+        ];
+
+        finalStream = new MediaStream(finalTracks);
+      }
+
+      let mimeType = "video/webm;codecs=vp9,opus";
+      if(!MediaRecorder.isTypeSupported(mimeType)) mimeType = "video/webm;codecs=vp8,opus";
+      if(!MediaRecorder.isTypeSupported(mimeType)) mimeType = "video/webm";
+
+      const recorder = new MediaRecorder(finalStream, {
+        mimeType,
+        videoBitsPerSecond: 10000000,
+        audioBitsPerSecond: 192000
+      });
+
+      const chunks = [];
+      recorder.ondataavailable = e => { if(e.data && e.data.size) chunks.push(e.data); };
+
+      const done = new Promise(resolve => {
+        recorder.onstop = async () => {
+          const webmBlob = new Blob(chunks, { type: mimeType });
+
+          if(audioSource){
+            try{ audioSource.stop(); }catch(e){}
+          }
+          if(audioCtx){
+            audioCtx.close().catch(() => {});
+          }
+
+          try{
+            statusEl.textContent = "Рендер готовий. Конвертую у MP4...";
+            bar.style.width = "70%";
+
+            const mp4Blob = await convertWebMToMP4(webmBlob, fps);
+
+            if(objectUrl) URL.revokeObjectURL(objectUrl);
+            objectUrl = URL.createObjectURL(mp4Blob);
+
+            downloadLink.href = objectUrl;
+            downloadLink.download = "matematyka-u-nashomu-zhytti.mp4";
+            downloadLink.style.display = "inline-flex";
+            downloadLink.textContent = "⬇ Завантажити MP4";
+
+            statusEl.textContent = `Готово MP4. Тривалість ≈ ${total.toFixed(1)} сек.`;
+            bar.style.width = "100%";
+          }catch(err){
+            console.error("MP4 conversion error:", err);
+
+            if(objectUrl) URL.revokeObjectURL(objectUrl);
+            objectUrl = URL.createObjectURL(webmBlob);
+
+            downloadLink.href = objectUrl;
+            downloadLink.download = "matematyka-u-nashomu-zhytti.webm";
+            downloadLink.style.display = "inline-flex";
+            downloadLink.textContent = "⬇ Завантажити WebM";
+
+            statusEl.textContent = "MP4 не створився. Відкрий F12 → Console — там буде точна помилка. Поки доступний WebM.";
+            bar.style.width = "100%";
+          }
+
+          renderBtn.disabled = false;
+          autoPhrasesBtn.disabled = false;
+          resolve();
+        };
+      });
+
+      recorder.start(250);
+
+      if(audioSource && audioCtx){
+        audioSource.loop = true;
+        audioSource.start(0);
+      }
+
+      const start = performance.now();
+      const renderLoop = () => {
+        const elapsed = (performance.now() - start) / 1000;
+        const capped = Math.min(elapsed, total);
+        const idx = Math.min(slides.length - 1, Math.floor(capped / dur));
+        const local = Math.min(1, (capped - idx * dur) / dur);
+        drawFrame(slides[idx], local, idx);
+
+        bar.style.width = Math.min(100, (capped / total) * 100) + "%";
+
+        if(elapsed < total){
+          requestAnimationFrame(renderLoop);
+        }else{
+          drawFrame(slides[slides.length - 1], 1, slides.length - 1);
+          setTimeout(() => recorder.stop(), 250);
+        }
+      };
+      requestAnimationFrame(renderLoop);
+      await done;
+    };
+
+    styleSelect.addEventListener("change", () => {
+      if(slides[0]) drawFrame(slides[0], 0, 0);
+    });
+
+    // Initial demo frame
+    ctx.fillStyle = "#101827";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.textAlign = "center";
+    ctx.fillStyle = "#fff";
+    ctx.font = "800 72px Arial";
+    ctx.fillText("ДОДАЙ ФОТО", canvas.width / 2, canvas.height / 2 - 40);
+    ctx.font = "500 38px Arial";
+    ctx.fillStyle = "rgba(255,255,255,.72)";
+    ctx.fillText("і створи свій Reels", canvas.width / 2, canvas.height / 2 + 35);
+  </script>
+</body>
+</html>
