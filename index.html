@@ -199,6 +199,43 @@
 
     .footer-credit b { color: #fff }
 
+    /* ---------- reels gallery ---------- */
+    .gallery-section { padding: 46px 20px 60px; text-align: center }
+    .gallery-title { margin: 0 0 6px }
+    .gallery-subtitle { margin: 0 0 22px }
+
+    .gallery-slider {
+      display: flex; align-items: center; justify-content: center; gap: 14px;
+    }
+
+    .gallery-phone { flex: 0 0 auto; margin: 0 }
+
+    .gallery-video { width: 100%; height: 100%; object-fit: cover; background: #111 }
+
+    .gallery-empty {
+      position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 10px; color: rgba(255, 255, 255, .7); font-size: 13px; padding: 0 24px; text-align: center;
+    }
+
+    .gallery-arrow {
+      flex: 0 0 44px; width: 44px; height: 44px; border-radius: 50%; padding: 0;
+      background: #fff; border: 1px solid var(--line); box-shadow: var(--shadow);
+      font-size: 22px; line-height: 1; color: var(--blue); font-weight: 800;
+    }
+
+    .gallery-arrow:hover { background: #eef2ff }
+    .gallery-arrow:disabled { opacity: .4; cursor: not-allowed }
+
+    .gallery-dots { display: flex; justify-content: center; gap: 7px; margin-top: 16px }
+
+    .gallery-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: #d6ddec; border: 0; padding: 0; cursor: pointer;
+    }
+
+    .gallery-dot.active { background: var(--blue); width: 22px; border-radius: 999px }
+
+    .gallery-caption { margin-top: 12px; min-height: 16px }
+
     @media (max-width: 1050px) {
       .reels-grid { grid-template-columns: 1fr }
       .mini-steps { grid-template-columns: 1fr }
@@ -213,6 +250,8 @@
       .slide-row { grid-template-columns: 60px minmax(0, 1fr) 40px }
       .slide-row .icon-btn { grid-column: auto }
       .thumb { width: 60px; height: 86px }
+      .gallery-slider { gap: 8px }
+      .gallery-arrow { flex-basis: 36px; width: 36px; height: 36px; font-size: 18px }
     }
   </style>
 </head>
@@ -344,6 +383,37 @@
     </div>
   </footer>
 
+  <section class="gallery-section">
+    <div class="wrap">
+      <h2 class="gallery-title">Останні створені Reels</h2>
+      <p class="small gallery-subtitle">Тут з’являються Reels, які щойно згенерували інші відвідувачі сайту.</p>
+
+      <div class="gallery-slider">
+        <button type="button" class="gallery-arrow gallery-prev" aria-label="Попередній рілс">‹</button>
+
+        <div class="phone-shell gallery-phone">
+          <div class="preview-wrap">
+            <video id="galleryVideo" class="gallery-video" muted loop playsinline controls></video>
+            <div id="galleryEmpty" class="gallery-empty">
+              <div style="font-size:34px">🎬</div>
+              Тут з’являться перші згенеровані Reels
+            </div>
+          </div>
+        </div>
+
+        <button type="button" class="gallery-arrow gallery-next" aria-label="Наступний рілс">›</button>
+      </div>
+
+      <div id="galleryDots" class="gallery-dots"></div>
+      <div id="galleryCaption" class="small gallery-caption"></div>
+    </div>
+  </section>
+
+  <script type="module">
+    import { upload } from "https://esm.sh/@vercel/blob@2.8.0/client";
+    window.__blobUpload = upload;
+  </script>
+
   <script>
     const phrases = [
       "Математика навколо нас щодня.",
@@ -406,6 +476,93 @@
     }
 
     loadReelsCount();
+
+    const galleryVideo = document.getElementById("galleryVideo");
+    const galleryEmpty = document.getElementById("galleryEmpty");
+    const galleryDots = document.getElementById("galleryDots");
+    const galleryCaption = document.getElementById("galleryCaption");
+    const galleryPrevBtn = document.querySelector(".gallery-prev");
+    const galleryNextBtn = document.querySelector(".gallery-next");
+
+    let galleryItems = [];
+    let galleryIndex = 0;
+
+    function renderGallery(){
+      const hasItems = galleryItems.length > 0;
+
+      galleryVideo.style.display = hasItems ? "block" : "none";
+      galleryEmpty.style.display = hasItems ? "none" : "flex";
+      galleryPrevBtn.disabled = !hasItems;
+      galleryNextBtn.disabled = !hasItems;
+
+      if(!hasItems){
+        galleryDots.innerHTML = "";
+        galleryCaption.textContent = "";
+        return;
+      }
+
+      const item = galleryItems[galleryIndex];
+      if(galleryVideo.src !== item.url){
+        galleryVideo.src = item.url;
+        galleryVideo.play().catch(() => {});
+      }
+      galleryCaption.textContent = item.caption || "";
+
+      galleryDots.innerHTML = "";
+      galleryItems.forEach((_, i) => {
+        const dot = document.createElement("button");
+        dot.type = "button";
+        dot.className = "gallery-dot" + (i === galleryIndex ? " active" : "");
+        dot.setAttribute("aria-label", "Рілс " + (i + 1));
+        dot.onclick = () => { galleryIndex = i; renderGallery(); };
+        galleryDots.appendChild(dot);
+      });
+    }
+
+    async function loadGallery(){
+      try{
+        const r = await fetch("/api/gallery");
+        const data = await r.json();
+        if(Array.isArray(data.items)){
+          galleryItems = data.items;
+          galleryIndex = 0;
+          renderGallery();
+        }
+      }catch(err){
+        console.warn("Не вдалося завантажити галерею рілсів:", err);
+      }
+    }
+
+    galleryPrevBtn.onclick = () => {
+      if(!galleryItems.length) return;
+      galleryIndex = (galleryIndex - 1 + galleryItems.length) % galleryItems.length;
+      renderGallery();
+    };
+
+    galleryNextBtn.onclick = () => {
+      if(!galleryItems.length) return;
+      galleryIndex = (galleryIndex + 1) % galleryItems.length;
+      renderGallery();
+    };
+
+    async function uploadReelToGallery(webmBlob, caption){
+      if(typeof window.__blobUpload !== "function") return;
+
+      try{
+        const filename = `reel-${Date.now()}.webm`;
+        await window.__blobUpload(filename, webmBlob, {
+          access: "public",
+          handleUploadUrl: "/api/upload-reel",
+          clientPayload: JSON.stringify({ caption })
+        });
+
+        loadGallery();
+      }catch(err){
+        console.warn("Не вдалося додати рілс у галерею:", err);
+      }
+    }
+
+    loadGallery();
 
     let ffmpegInstance = null;
     let ffmpegReady = false;
@@ -829,6 +986,7 @@
       const done = new Promise(resolve => {
         recorder.onstop = async () => {
           const webmBlob = new Blob(chunks, { type: mimeType });
+          uploadReelToGallery(webmBlob, slides[0] ? slides[0].text : "");
 
           if(audioSource){
             try{ audioSource.stop(); }catch(e){}
