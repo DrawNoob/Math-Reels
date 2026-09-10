@@ -205,36 +205,47 @@
     .gallery-subtitle { margin: 0 0 22px }
 
     .gallery-slider {
-      display: flex; align-items: center; justify-content: center; gap: 14px;
+      display: flex; align-items: center; justify-content: center; gap: 12px;
     }
 
-    .gallery-phone { flex: 0 0 auto; margin: 0 }
+    .gallery-track {
+      display: flex; gap: 12px; overflow-x: auto; scroll-behavior: smooth; scroll-snap-type: x proximity;
+      padding: 4px 2px; max-width: 100%;
+      scrollbar-width: none;
+    }
 
-    .gallery-video { width: 100%; height: 100%; object-fit: cover; background: #111 }
+    .gallery-track::-webkit-scrollbar { display: none }
+
+    .gallery-card {
+      flex: 0 0 auto; width: 120px; scroll-snap-align: start;
+    }
+
+    .gallery-card-frame {
+      width: 120px; aspect-ratio: 9 / 16; border-radius: 16px; overflow: hidden;
+      background: #111827; box-shadow: 0 10px 26px rgba(17, 24, 39, .18);
+    }
+
+    .gallery-video { width: 100%; height: 100%; object-fit: cover; background: #111; display: block }
+
+    .gallery-card-caption {
+      margin-top: 8px; font-size: 11px; color: var(--muted); line-height: 1.3;
+      display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
 
     .gallery-empty {
-      position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 10px; color: rgba(255, 255, 255, .7); font-size: 13px; padding: 0 24px; text-align: center;
+      flex: 1 1 auto; min-height: 160px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 8px; color: var(--muted); font-size: 13px; padding: 20px; text-align: center;
     }
 
     .gallery-arrow {
-      flex: 0 0 44px; width: 44px; height: 44px; border-radius: 50%; padding: 0;
+      flex: 0 0 40px; width: 40px; height: 40px; border-radius: 50%; padding: 0;
       background: #fff; border: 1px solid var(--line); box-shadow: var(--shadow);
-      font-size: 22px; line-height: 1; color: var(--blue); font-weight: 800;
+      color: var(--blue); display: flex; align-items: center; justify-content: center;
+      transition: background .15s ease, transform .15s ease;
     }
 
-    .gallery-arrow:hover { background: #eef2ff }
-    .gallery-arrow:disabled { opacity: .4; cursor: not-allowed }
-
-    .gallery-dots { display: flex; justify-content: center; gap: 7px; margin-top: 16px }
-
-    .gallery-dot {
-      width: 8px; height: 8px; border-radius: 50%; background: #d6ddec; border: 0; padding: 0; cursor: pointer;
-    }
-
-    .gallery-dot.active { background: var(--blue); width: 22px; border-radius: 999px }
-
-    .gallery-caption { margin-top: 12px; min-height: 16px }
+    .gallery-arrow:hover { background: #eef2ff; transform: translateY(-1px) }
+    .gallery-arrow:disabled { opacity: .35; cursor: not-allowed; transform: none }
 
     @media (max-width: 1050px) {
       .reels-grid { grid-template-columns: 1fr }
@@ -251,7 +262,8 @@
       .slide-row .icon-btn { grid-column: auto }
       .thumb { width: 60px; height: 86px }
       .gallery-slider { gap: 8px }
-      .gallery-arrow { flex-basis: 36px; width: 36px; height: 36px; font-size: 18px }
+      .gallery-arrow { flex-basis: 34px; width: 34px; height: 34px }
+      .gallery-card, .gallery-card-frame { width: 100px }
     }
   </style>
 </head>
@@ -389,23 +401,21 @@
       <p class="small gallery-subtitle">Тут з’являються Reels, які щойно згенерували інші відвідувачі сайту.</p>
 
       <div class="gallery-slider">
-        <button type="button" class="gallery-arrow gallery-prev" aria-label="Попередній рілс">‹</button>
+        <button type="button" class="gallery-arrow gallery-prev" aria-label="Прокрутити вліво">
+          <svg viewBox="0 0 24 24" width="18" height="18"><path d="M15 5 L8 12 L15 19" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
 
-        <div class="phone-shell gallery-phone">
-          <div class="preview-wrap">
-            <video id="galleryVideo" class="gallery-video" muted loop playsinline controls></video>
-            <div id="galleryEmpty" class="gallery-empty">
-              <div style="font-size:34px">🎬</div>
-              Тут з’являться перші згенеровані Reels
-            </div>
+        <div id="galleryTrack" class="gallery-track">
+          <div id="galleryEmpty" class="gallery-empty">
+            <div style="font-size:30px">🎬</div>
+            Тут з’являться перші згенеровані Reels
           </div>
         </div>
 
-        <button type="button" class="gallery-arrow gallery-next" aria-label="Наступний рілс">›</button>
+        <button type="button" class="gallery-arrow gallery-next" aria-label="Прокрутити вправо">
+          <svg viewBox="0 0 24 24" width="18" height="18"><path d="M9 5 L16 12 L9 19" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
       </div>
-
-      <div id="galleryDots" class="gallery-dots"></div>
-      <div id="galleryCaption" class="small gallery-caption"></div>
     </div>
   </section>
 
@@ -477,45 +487,56 @@
 
     loadReelsCount();
 
-    const galleryVideo = document.getElementById("galleryVideo");
+    const galleryTrack = document.getElementById("galleryTrack");
     const galleryEmpty = document.getElementById("galleryEmpty");
-    const galleryDots = document.getElementById("galleryDots");
-    const galleryCaption = document.getElementById("galleryCaption");
     const galleryPrevBtn = document.querySelector(".gallery-prev");
     const galleryNextBtn = document.querySelector(".gallery-next");
 
     let galleryItems = [];
-    let galleryIndex = 0;
+
+    function pauseOtherGalleryVideos(current){
+      galleryTrack.querySelectorAll("video").forEach(v => {
+        if(v !== current) v.pause();
+      });
+    }
 
     function renderGallery(){
-      const hasItems = galleryItems.length > 0;
+      galleryTrack.querySelectorAll(".gallery-card").forEach(el => el.remove());
 
-      galleryVideo.style.display = hasItems ? "block" : "none";
+      const hasItems = galleryItems.length > 0;
       galleryEmpty.style.display = hasItems ? "none" : "flex";
       galleryPrevBtn.disabled = !hasItems;
       galleryNextBtn.disabled = !hasItems;
 
-      if(!hasItems){
-        galleryDots.innerHTML = "";
-        galleryCaption.textContent = "";
-        return;
-      }
+      galleryItems.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "gallery-card";
 
-      const item = galleryItems[galleryIndex];
-      if(galleryVideo.src !== item.url){
-        galleryVideo.src = item.url;
-        galleryVideo.play().catch(() => {});
-      }
-      galleryCaption.textContent = item.caption || "";
+        const frame = document.createElement("div");
+        frame.className = "gallery-card-frame";
 
-      galleryDots.innerHTML = "";
-      galleryItems.forEach((_, i) => {
-        const dot = document.createElement("button");
-        dot.type = "button";
-        dot.className = "gallery-dot" + (i === galleryIndex ? " active" : "");
-        dot.setAttribute("aria-label", "Рілс " + (i + 1));
-        dot.onclick = () => { galleryIndex = i; renderGallery(); };
-        galleryDots.appendChild(dot);
+        const video = document.createElement("video");
+        video.className = "gallery-video";
+        video.src = item.url;
+        video.controls = true;
+        video.playsInline = true;
+        video.loop = true;
+        video.setAttribute("controlslist", "nodownload noremoteplayback");
+        video.setAttribute("disablepictureinpicture", "");
+        video.oncontextmenu = () => false;
+        video.addEventListener("play", () => pauseOtherGalleryVideos(video));
+
+        frame.appendChild(video);
+        card.appendChild(frame);
+
+        if(item.caption){
+          const caption = document.createElement("div");
+          caption.className = "gallery-card-caption";
+          caption.textContent = item.caption;
+          card.appendChild(caption);
+        }
+
+        galleryTrack.appendChild(card);
       });
     }
 
@@ -525,7 +546,6 @@
         const data = await r.json();
         if(Array.isArray(data.items)){
           galleryItems = data.items;
-          galleryIndex = 0;
           renderGallery();
         }
       }catch(err){
@@ -533,17 +553,14 @@
       }
     }
 
-    galleryPrevBtn.onclick = () => {
-      if(!galleryItems.length) return;
-      galleryIndex = (galleryIndex - 1 + galleryItems.length) % galleryItems.length;
-      renderGallery();
-    };
+    function scrollGallery(dir){
+      const card = galleryTrack.querySelector(".gallery-card");
+      const step = card ? card.getBoundingClientRect().width + 12 : 140;
+      galleryTrack.scrollBy({ left: dir * step * 2, behavior: "smooth" });
+    }
 
-    galleryNextBtn.onclick = () => {
-      if(!galleryItems.length) return;
-      galleryIndex = (galleryIndex + 1) % galleryItems.length;
-      renderGallery();
-    };
+    galleryPrevBtn.onclick = () => scrollGallery(-1);
+    galleryNextBtn.onclick = () => scrollGallery(1);
 
     async function uploadReelToGallery(webmBlob, caption){
       if(typeof window.__blobUpload !== "function") return;
@@ -603,7 +620,7 @@
       ffmpeg.on("progress", ({ progress }) => {
         const p = Math.max(0, Math.min(1, progress || 0));
         bar.style.width = (70 + p * 28) + "%";
-        statusEl.textContent = "Конвертую у MP4... " + Math.round(p * 100) + "%";
+        statusEl.textContent = "Відео конвертується... Не оновлюйте сторінку.";
       });
 
       await ffmpeg.load({
@@ -996,7 +1013,7 @@
           }
 
           try{
-            statusEl.textContent = "Рендер готовий. Конвертую у MP4...";
+            statusEl.textContent = "Відео конвертується... Не оновлюйте сторінку.";
             bar.style.width = "70%";
 
             const mp4Blob = await convertWebMToMP4(webmBlob, fps);
