@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>Reels: Математика у нашому житті — інструкція + генератор</title>
+  <title>Генератор Reels — інструкція + мінігенератор на будь-яку тему</title>
   <style>
     :root {
       --bg: #f5f7fb;
@@ -270,9 +270,9 @@
 <body>
   <section class="hero">
     <div class="wrap">
-      <div class="pill">📐 Освітній Reels • 9:16 • Instagram / TikTok</div>
-      <h1>Математика у нашому житті</h1>
-      <p>Готова інструкція + мінігенератор: додаєш фото, сервіс сам розкладає їх по слайдах, накладає тематичні фрази, показує вертикальний прев’ю і рендерить відео для Reels.</p>
+      <div class="pill">🎬 Генератор Reels • 9:16 • Instagram / TikTok</div>
+      <h1>Генератор Reels на будь-яку тему</h1>
+      <p>Готова інструкція + мінігенератор: обери тему, додай фото — сервіс сам розкладе їх по слайдах, накладе тематичні фрази, покаже вертикальний прев’ю і зрендерить готове відео для Reels.</p>
     </div>
   </section>
 
@@ -305,6 +305,18 @@
             <span class="small">Обери декілька JPG / PNG / WEBP</span>
           </label>
           <input id="photos" type="file" accept="image/*" multiple>
+
+          <div style="margin-top:14px">
+            <label for="topic">Тема Reels</label>
+            <select id="topic">
+              <option value="math" selected>📐 Математика</option>
+              <option value="history">🏛️ Історія</option>
+              <option value="science">🔬 Наука</option>
+              <option value="health">🩺 Здоров’я</option>
+              <option value="motivation">🔥 Мотивація</option>
+              <option value="travel">✈️ Подорожі</option>
+            </select>
+          </div>
 
           <div class="row" style="margin-top:14px">
             <div>
@@ -373,7 +385,7 @@
           </div>
 
           <div class="controls download-controls" style="justify-content:center">
-            <a id="downloadLink" class="btn green" style="display:none;text-decoration:none" download="matematyka-u-nashomu-zhytti.mp4">⬇ Завантажити MP4</a>
+            <a id="downloadLink" class="btn green" style="display:none;text-decoration:none" download="reel.mp4">⬇ Завантажити MP4</a>
           </div>
 
           <div class="success small">
@@ -425,18 +437,98 @@
   </script>
 
   <script>
-    const phrases = [
-      "Математика навколо нас щодня.",
-      "Знижки в магазині — це відсотки.",
-      "Час і дорога — це швидкість та відстань.",
-      "Кулінарія — це пропорції.",
-      "Покупки — це бюджет і підрахунки.",
-      "Спорт — це час, темп і статистика.",
-      "Ремонт — це площа, довжина й вимірювання.",
-      "Навіть телефон рахує більше, ніж ми помічаємо.",
-      "Математика допомагає приймати рішення.",
-      "Математика — не лише урок. Це життя."
-    ];
+    const TOPICS = {
+      math: {
+        label: "Математика",
+        phrases: [
+          "Математика навколо нас щодня.",
+          "Знижки в магазині — це відсотки.",
+          "Час і дорога — це швидкість та відстань.",
+          "Кулінарія — це пропорції.",
+          "Покупки — це бюджет і підрахунки.",
+          "Спорт — це час, темп і статистика.",
+          "Ремонт — це площа, довжина й вимірювання.",
+          "Навіть телефон рахує більше, ніж ми помічаємо.",
+          "Математика допомагає приймати рішення.",
+          "Математика — не лише урок. Це життя."
+        ]
+      },
+      history: {
+        label: "Історія",
+        phrases: [
+          "Кожен день навколо — сліди минулого.",
+          "Історія починається з твого міста.",
+          "Старі вулиці пам’ятають більше, ніж здається.",
+          "Минуле пояснює сьогодення.",
+          "Кожна дата — це чиясь доля.",
+          "Музеї — це машини часу.",
+          "Історію пишуть не лише переможці.",
+          "Знати минуле — розуміти майбутнє."
+        ]
+      },
+      science: {
+        label: "Наука",
+        phrases: [
+          "Наука ховається у кожній дрібниці.",
+          "Хімія — це навіть чашка кави.",
+          "Фізика працює, навіть коли ти цього не бачиш.",
+          "Природа — найкращий вчений.",
+          "Кожен винахід починався з питання «чому?».",
+          "Наука — це цікавість, доведена до відповіді.",
+          "Експеримент — краще за сто теорій.",
+          "Наука змінює світ швидше, ніж здається."
+        ]
+      },
+      health: {
+        label: "Здоров’я",
+        phrases: [
+          "Здоров’я — це звички, а не диво.",
+          "Сон впливає більше, ніж ми думаємо.",
+          "Вода — найпростіші ліки.",
+          "Рух — це інвестиція у майбутнє.",
+          "Маленькі звички рятують роки життя.",
+          "Тіло говорить — варто слухати.",
+          "Здоров’я починається з ранку.",
+          "Турбота про себе — не егоїзм."
+        ]
+      },
+      motivation: {
+        label: "Мотивація",
+        phrases: [
+          "Малий крок сьогодні — великий результат завтра.",
+          "Дисципліна сильніша за натхнення.",
+          "Помилки — це не поразка, а дані.",
+          "Починай, навіть якщо страшно.",
+          "Прогрес важливіший за ідеальність.",
+          "Твій темп — це нормально.",
+          "Ти вже зробив перший крок.",
+          "Складно зараз — легше потім."
+        ]
+      },
+      travel: {
+        label: "Подорожі",
+        phrases: [
+          "Світ більший, ніж екран телефону.",
+          "Кожна подорож змінює погляд на життя.",
+          "Нове місто — нові ідеї.",
+          "Мандри вчать швидше за книги.",
+          "Дорога — теж частина пригоди.",
+          "Не всі скарби на карті позначені.",
+          "Подорожуй, поки є сили й час.",
+          "Кожна валіза ховає історію."
+        ]
+      }
+    };
+
+    const topicSelect = document.getElementById("topic");
+
+    function currentTopic(){
+      return TOPICS[topicSelect.value] || TOPICS.math;
+    }
+
+    function currentWatermark(){
+      return currentTopic().label.toUpperCase() + " У НАШОМУ ЖИТТІ";
+    }
 
     const photosInput = document.getElementById("photos");
     const slidesEl = document.getElementById("slides");
@@ -762,7 +854,7 @@
       if(!files.length) return;
 
       statusEl.textContent = "Завантажую фото...";
-      const assigned = shuffle(phrases);
+      const assigned = shuffle(currentTopic().phrases);
 
       for(let i = 0; i < files.length; i++){
         const loaded = await loadImage(files[i]);
@@ -823,13 +915,17 @@
     }
 
     autoPhrasesBtn.onclick = () => {
-      const assigned = shuffle(phrases);
+      const assigned = shuffle(currentTopic().phrases);
       slides.forEach((s, i) => {
         s.text = assigned[i % assigned.length];
       });
       buildSlideEditor();
       if(slides[0]) drawFrame(slides[0], 0, 0);
     };
+
+    topicSelect.addEventListener("change", () => {
+      if(slides.length) autoPhrasesBtn.onclick();
+    });
 
     function drawCover(img, progress){
       const cw = canvas.width, ch = canvas.height;
@@ -919,7 +1015,7 @@
 
       ctx.font = "700 30px Arial";
       ctx.fillStyle = "rgba(255,255,255,.82)";
-      ctx.fillText("МАТЕМАТИКА У НАШОМУ ЖИТТІ", canvas.width / 2, y + boxH - 46);
+      ctx.fillText(currentWatermark(), canvas.width / 2, y + boxH - 46);
       ctx.restore();
     }
 
@@ -1014,7 +1110,7 @@
             objectUrl = URL.createObjectURL(mp4Blob);
 
             downloadLink.href = objectUrl;
-            downloadLink.download = "matematyka-u-nashomu-zhytti.mp4";
+            downloadLink.download = `reel-${topicSelect.value}.mp4`;
             downloadLink.style.display = "inline-flex";
             downloadLink.textContent = "⬇ Завантажити MP4";
 
@@ -1028,7 +1124,7 @@
             objectUrl = URL.createObjectURL(webmBlob);
 
             downloadLink.href = objectUrl;
-            downloadLink.download = "matematyka-u-nashomu-zhytti.webm";
+            downloadLink.download = `reel-${topicSelect.value}.webm`;
             downloadLink.style.display = "inline-flex";
             downloadLink.textContent = "⬇ Завантажити WebM";
 
