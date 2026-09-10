@@ -164,6 +164,41 @@
     .footer-note { font-size: 12px; color: var(--muted); margin-top: 10px }
     code { background: #eef2f7; padding: 2px 5px; border-radius: 5px }
 
+    /* ---------- site footer / stats ---------- */
+    .site-footer {
+      margin-top: 10px;
+      padding: 46px 20px 30px;
+      background:
+        radial-gradient(circle at 12% 25%, rgba(255, 255, 255, .12), transparent 30%),
+        radial-gradient(circle at 88% 20%, rgba(255, 255, 255, .1), transparent 26%),
+        linear-gradient(135deg, #1c2b66, #2f469f 55%, #4e70e9);
+      color: #fff;
+      text-align: center;
+    }
+
+    .footer-inner { display: flex; flex-direction: column; align-items: center; gap: 6px }
+
+    .footer-stat-label {
+      font-size: 13px; font-weight: 700; letter-spacing: .4px;
+      color: rgba(255, 255, 255, .78); text-transform: uppercase;
+    }
+
+    .footer-count {
+      font-size: clamp(46px, 9vw, 72px); font-weight: 900; line-height: 1;
+      background: linear-gradient(135deg, #fff, #cfdcff);
+      -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+
+    .footer-count-caption { font-size: 16px; color: #e9eeff; margin-bottom: 10px }
+
+    .footer-credit {
+      margin-top: 16px; padding-top: 16px; width: 100%; max-width: 460px;
+      border-top: 1px solid rgba(255, 255, 255, .18);
+      font-size: 13px; color: rgba(255, 255, 255, .78);
+    }
+
+    .footer-credit b { color: #fff }
+
     @media (max-width: 1050px) {
       .reels-grid { grid-template-columns: 1fr }
       .mini-steps { grid-template-columns: 1fr }
@@ -198,7 +233,7 @@
         <div class="mini-steps">
           <div><b>1.</b> Додай 3–5 фото</div>
           <div><b>2.</b> Залиши коротку фразу на кожному кадрі</div>
-          <div><b>3.</b> Створи вертикальне відео 9:16 і завантаж його</div>
+          <div><b>3.</b> Створи вертикальне відео 9:16 і завантаж</div>
         </div>
       </section>
 
@@ -228,6 +263,7 @@
             <div>
               <label for="textStyle">Стиль тексту</label>
               <select id="textStyle">
+                <option value="mixed" selected>Змішаний</option>
                 <option value="bottom">Знизу</option>
                 <option value="center">По центру</option>
                 <option value="top">Зверху</option>
@@ -298,6 +334,16 @@
     </div>
   </main>
 
+  <footer class="site-footer">
+    <div class="wrap footer-inner">
+      <div class="footer-stat-label">🎬 Створено на цьому сайті</div>
+      <div class="footer-count" id="reelsCount">0</div>
+      <div class="footer-count-caption">Reels згенеровано користувачами</div>
+      <div class="footer-credit">Зроблено студентом групи <b>КІ&nbsp;-&nbsp;427</b></div>
+      <div>2026</div>
+    </div>
+  </footer>
+
   <script>
     const phrases = [
       "Математика навколо нас щодня.",
@@ -332,6 +378,34 @@
     let objectUrl = null;
     let musicBuffer = null;
     let musicFileName = "";
+
+    const reelsCountEl = document.getElementById("reelsCount");
+
+    function renderReelsCount(n){
+      if(reelsCountEl) reelsCountEl.textContent = n;
+    }
+
+    async function loadReelsCount(){
+      try{
+        const r = await fetch("/api/count");
+        const data = await r.json();
+        if(typeof data.count === "number") renderReelsCount(data.count);
+      }catch(err){
+        console.warn("Не вдалося завантажити спільний лічильник рілсів:", err);
+      }
+    }
+
+    async function incrementReelsCount(){
+      try{
+        const r = await fetch("/api/count", { method: "POST" });
+        const data = await r.json();
+        if(typeof data.count === "number") renderReelsCount(data.count);
+      }catch(err){
+        console.warn("Не вдалося оновити спільний лічильник рілсів:", err);
+      }
+    }
+
+    loadReelsCount();
 
     let ffmpegInstance = null;
     let ffmpegReady = false;
@@ -630,6 +704,15 @@
       return lines;
     }
 
+    const MIXED_BORDER_COLORS = [
+      "rgba(255,150,150,.6)",
+      "rgba(255,199,122,.6)",
+      "rgba(226,214,120,.6)",
+      "rgba(140,214,160,.6)",
+      "rgba(130,196,255,.6)",
+      "rgba(195,160,255,.6)"
+    ];
+
     function drawOverlayText(text, style, index){
       const pad = 84;
       const boxW = canvas.width - pad * 2;
@@ -639,15 +722,24 @@
       const lineH = fontSize * 1.18;
       const boxH = Math.max(220, lines.length * lineH + 130);
 
+      const isMixed = style === "mixed";
+      const effectiveStyle = isMixed ? (index % 2 === 0 ? "bottom" : "top") : style;
+
       let y;
-      if(style === "top") y = 170;
-      else if(style === "center") y = (canvas.height - boxH) / 2;
+      if(effectiveStyle === "top") y = 170;
+      else if(effectiveStyle === "center") y = (canvas.height - boxH) / 2;
       else y = canvas.height - boxH - 220;
 
       ctx.save();
-      ctx.fillStyle = "rgba(9,17,33,.66)";
       roundRectPath(pad, y, boxW, boxH, 34);
+      ctx.fillStyle = "rgba(9,17,33,.66)";
       ctx.fill();
+
+      if(isMixed){
+        ctx.lineWidth = 4;
+        ctx.strokeStyle = MIXED_BORDER_COLORS[index % MIXED_BORDER_COLORS.length];
+        ctx.stroke();
+      }
 
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
@@ -761,6 +853,7 @@
 
             statusEl.textContent = `Готово MP4. Тривалість ≈ ${total.toFixed(1)} сек.`;
             bar.style.width = "100%";
+            incrementReelsCount();
           }catch(err){
             console.error("MP4 conversion error:", err);
 
@@ -774,6 +867,7 @@
 
             statusEl.textContent = "MP4 не створився. Відкрий F12 → Console — там буде точна помилка. Поки доступний WebM.";
             bar.style.width = "100%";
+            incrementReelsCount();
           }
 
           renderBtn.disabled = false;
